@@ -83,7 +83,7 @@ def send():
             kp, des = orb.compute(img, kp)
             # draw only keypoints location,not size and orientation
             img2 = cv2.drawKeypoints(img,kp,None,color=(0,255,0), flags=0)
-            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], "keyed.png"), img2)
+            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], + name + ownerid + "keyed.png"), img2)
 
             name = request.form['charaname']
             ownerid = request.form['twitterid']
@@ -95,7 +95,7 @@ def send():
             with open('./ownerdata/csv/' + name + ownerid + '.pickle', mode='wb') as f:
                 pickle.dump((name, ownerid, des), f)
 
-            return render_template('owner.html', img_url='/ownerdata/keyed.png')
+            return render_template('owner.html', img_url='/ownerdata/' + name + ownerid + 'keyed.png')
         else:
             return ''' <p>許可されていない拡張子です</p> '''
     else:
