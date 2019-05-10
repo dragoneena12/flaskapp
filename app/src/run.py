@@ -88,7 +88,7 @@ def send():
             name = request.form['charaname']
             ownerid = request.form['twitterid']
 
-            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], + name + ownerid + "keyed.png"), img2)
+            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], name + ownerid + "keyed.png"), img2)
             index = []
             index.append((name, ownerid))
             for p in des:
