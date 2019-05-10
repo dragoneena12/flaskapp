@@ -83,11 +83,12 @@ def send():
             kp, des = orb.compute(img, kp)
             # draw only keypoints location,not size and orientation
             img2 = cv2.drawKeypoints(img,kp,None,color=(0,255,0), flags=0)
-            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], + name + ownerid + "keyed.png"), img2)
+            
 
             name = request.form['charaname']
             ownerid = request.form['twitterid']
 
+            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], + name + ownerid + "keyed.png"), img2)
             index = []
             index.append((name, ownerid))
             for p in des:
