@@ -86,7 +86,7 @@ def send():
             img = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], filename), 0)
             orig_width = img.shape[0]
             orig_height = img.shape[1]
-            (target_width, target_height) = (M, orig_height * M / orig_width) if orig_width > orig_height else (orig_width * M / orig_height, M)
+            (target_width, target_height) = (M, orig_height * M // orig_width) if orig_width > orig_height else (orig_width * M // orig_height, M)
             img = cv2.resize(img, dsize=(target_width, target_height))
             # find the keypoints with ORB
             kp = orb.detect(img,None)
