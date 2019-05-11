@@ -16,6 +16,7 @@ app = Flask(__name__, template_folder='./templates')
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif'])
 UPLOAD_FOLDER = './ownerdata/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+M = 400 #resize
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -39,6 +40,10 @@ def search():
             img_url = '/ownerdata/' + filename
             orb = cv2.ORB_create()
             img = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], filename), 0)
+            orig_width = img.shape[0]
+            orig_height = img.shape[1]
+            (target_width, target_height) = (M, orig_height * M / orig_width) if orig_width > orig_height else (orig_width * M / orig_height, M)
+            img = cv2.resize(img, dsize=(target_width, target_height))
             # find the keypoints with ORB
             kp = orb.detect(img,None)
             # compute the descriptors with ORB
@@ -79,6 +84,10 @@ def send():
 
             orb = cv2.ORB_create()
             img = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], filename), 0)
+            orig_width = img.shape[0]
+            orig_height = img.shape[1]
+            (target_width, target_height) = (M, orig_height * M / orig_width) if orig_width > orig_height else (orig_width * M / orig_height, M)
+            img = cv2.resize(img, dsize=(target_width, target_height))
             # find the keypoints with ORB
             kp = orb.detect(img,None)
             # compute the descriptors with ORB
