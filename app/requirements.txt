@@ -1,4 +1,5 @@
 Flask
 uwsgi
+Werkzeug
 numpy
 opencv-python

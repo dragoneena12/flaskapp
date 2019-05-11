@@ -48,19 +48,20 @@ def search():
                 data = []
                 des = []
                 with open(file, 'rb') as f:
-                    name, ownerid, des = pickle.load(f)
+                    datnum, name, ownerid, des = pickle.load(f)
                     data.append(name)
                     data.append(ownerid)
                 bf = cv2.BFMatcher()
                 matches = bf.knnMatch(des_up, des, k=2)
-                ratio = 0.5
+                ratio = 0.75
                 goodnum = 0
                 for m, n in matches:
                     if m.distance < ratio * n.distance:
                         goodnum += 1
                 data.append(goodnum)
                 matchdata.append(data)        
-            return render_template('owner.html', sdatas = matchdata)
+            matchdata.sort(key=itemgetter(2))
+            return render_template('owner.html', sdatas = matchdata[:10])
         else:
             return ''' <p>許可されていない拡張子です</p> '''
     else:
@@ -88,15 +89,18 @@ def send():
             name = request.form['charaname']
             ownerid = request.form['twitterid']
 
-            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], name + ownerid + "keyed.png"), img2)
-            index = []
-            index.append((name, ownerid))
-            for p in des:
-                index.append(p)
-            with open('./ownerdata/csv/' + name + ownerid + '.pickle', mode='wb') as f:
-                pickle.dump((name, ownerid, des), f)
+            if not os.path.exists('./ownerdata/datanum.dat'):
+                with open('./ownerdata/datanum.dat', mode='wb') as f:
+                    pickle.dump(0, f)
+            with open('./ownerdata/datanum.dat', mode='r+b') as f:
+                datnum = pickle.load(f)
+                pickle.dump(datnum + 1, f)
 
-            return render_template('owner.html', img_url='/ownerdata/' + name + ownerid + 'keyed.png')
+            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], str(datnum) + "_keyed.png"), img2)
+            with open('./ownerdata/csv/' + name + ownerid + '.pickle', mode='wb') as f:
+                pickle.dump((datnum, name, ownerid, des), f)
+
+            return render_template('owner.html', img_url='/ownerdata/' + str(datnum) + '_keyed.png')
         else:
             return ''' <p>許可されていない拡張子です</p> '''
     else:
@@ -109,8 +113,8 @@ def datashow():
         files = glob.glob("./ownerdata/csv/*")
         for file in files:
             with open(file, 'rb') as f:
-                name, ownerid, des = pickle.load(f)
-                datas.append((name, ownerid))
+                datnum, name, ownerid, des = pickle.load(f)
+                datas.append((datnum, name, ownerid))
         return render_template('owner.html', datas = datas)
     else:
         return redirect(url_for('index'))
