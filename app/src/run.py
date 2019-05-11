@@ -8,6 +8,7 @@ from werkzeug import secure_filename
 import cv2
 import pickle
 import glob
+from operator import itemgetter
 # [Import end]
 
 app = Flask(__name__, template_folder='./templates')
@@ -32,7 +33,7 @@ def owner():
 def search():
     if request.method == 'POST':
         img_file = request.files['img_file']
-        if img_file and allowed_file(img_file.filename):
+        if img_file:
             filename = secure_filename(img_file.filename)
             img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             img_url = '/ownerdata/' + filename
@@ -60,7 +61,7 @@ def search():
                         goodnum += 1
                 data.append(goodnum)
                 matchdata.append(data)        
-            matchdata.sort(key=itemgetter(2))
+            matchdata.sort(key=itemgetter(2), reverse=True)
             return render_template('owner.html', sdatas = matchdata[:10])
         else:
             return ''' <p>許可されていない拡張子です</p> '''
@@ -71,7 +72,7 @@ def search():
 def send():
     if request.method == 'POST':
         img_file = request.files['img_file']
-        if img_file and allowed_file(img_file.filename):
+        if img_file:
             filename = secure_filename(img_file.filename)
             img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             img_url = '/ownerdata/' + filename
@@ -88,16 +89,18 @@ def send():
 
             name = request.form['charaname']
             ownerid = request.form['twitterid']
-
+            
             if not os.path.exists('./ownerdata/datanum.dat'):
                 with open('./ownerdata/datanum.dat', mode='wb') as f:
                     pickle.dump(0, f)
-            with open('./ownerdata/datanum.dat', mode='r+b') as f:
+            with open('./ownerdata/datanum.dat', mode='rb') as f:
                 datnum = pickle.load(f)
+                os.remove('./ownerdata/datanum.dat')
+            with open('./ownerdata/datanum.dat', mode='wb') as f:
                 pickle.dump(datnum + 1, f)
 
             cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'], str(datnum) + "_keyed.png"), img2)
-            with open('./ownerdata/csv/' + name + ownerid + '.pickle', mode='wb') as f:
+            with open('./ownerdata/csv/' + str(datnum) + '.pickle', mode='wb') as f:
                 pickle.dump((datnum, name, ownerid, des), f)
 
             return render_template('owner.html', img_url='/ownerdata/' + str(datnum) + '_keyed.png')

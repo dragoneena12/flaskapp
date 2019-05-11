@@ -2,12 +2,11 @@
 {% block content %}
     <h1>着ぐるみオーナーさん探しアプリ</h1>
     <h2>検索</h2>
-    {% if not sdatas %}
     <form method="post" action="/owner/search" enctype="multipart/form-data">
         <input type="file" id="img_file" name="img_file" class="col-sm-4"><br>
         <input type="submit" value="検索" class="btn">
     </form>
-    {% else %}
+    {% if sdata %}
     <table class="table table-striped">
         <thread>
           <tr>
@@ -31,24 +30,22 @@
     {% endif %}
 
     <h2>登録</h2>
-    {% if img_url %}
-    キャラデータの登録に成功しました！
-    <p><img src="{{ img_url }}" height="200"></p>
-    {% else %}
     <form method="post" action="/owner/send" enctype="multipart/form-data">
         <input type="file" id="img_file" name="img_file" class="col-sm-4"><br>
         キャラの名前：<input type="text" name="charaname" size="40"><br>
         オーナーさんのTwitterID：<input type="text" name="twitterid" size="40"><br>
         <input type="submit" value="送信" class="btn">
     </form>
+    {% if img_url %}
+    キャラデータの登録に成功しました！
+    <p><img src="{{ img_url }}" height="200"></p>
     {% endif %}
 
     <h2>データベース表示</h2>
-    {% if not datas %}
     <form method="post" action="/owner/datashow" enctype="multipart/form-data">
         <input type="submit" value="表示する" class="btn">
     </form>
-    {% else %}
+    {% if datas %}
     <table class="table table-striped">
         <thread>
           <tr>
